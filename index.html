@@ -43,6 +43,19 @@ header {
     100% { transform: translateX(-100%); }
 }
 
+<!-- Dropdown Menu -->
+<div class="dropdown">
+  <button class="dropbtn">Options ⚙️</button>
+  <div class="dropdown-content">
+    <a href="#" onclick="showPanel('flights')">Flights</a>
+    <a href="#" onclick="showPanel('ships')">Ships</a>
+    <a href="#" onclick="showPanel('iran')">Iran War Map</a>
+    <a href="#" onclick="showPanel('osint')">OSINT Feed</a>
+    <a href="https://notes.io/" target="_blank">Notes</a>
+    <a href="https://rsshub.app/inteldesk/live" target="_blank">IntelDesk Feed</a>
+  </div>
+</div>
+    
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -64,6 +77,67 @@ iframe {
     border: none;
 }
 </style>
+/* Dropdown container */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+}
+
+/* Button styling */
+.dropbtn {
+  background-color: #111;
+  color: #00ff00;
+  padding: 8px 16px;
+  font-size: 16px;
+  border: 1px solid #00ff00;
+  cursor: pointer;
+}
+
+/* Dropdown menu (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #000;
+  min-width: 200px;
+  border: 1px solid #00ff00;
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: #00ff00;
+  padding: 8px 12px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Hover effect */
+.dropdown-content a:hover {
+  background-color: #111;
+}
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Button hover */
+.dropdown:hover .dropbtn {
+  background-color: #111;
+}
+
+<script>
+function showPanel(panelId) {
+    // Hide all panels first
+    const panels = document.querySelectorAll('.panel');
+    panels.forEach(p => p.style.display = 'none');
+
+    // Show only the selected panel
+    const selected = document.getElementById(panelId);
+    if(selected) selected.style.display = 'block';
+}
+</script>
 </head>
 
 <body>
@@ -94,11 +168,6 @@ iframe {
         <iframe src="https://iranwarlive.com/"></iframe>
     </div>
 
-    <!-- OSINT Feed -->
-    <div class="panel">
-        <iframe src="https://rsshub.app/inteldesk/live"></iframe>
-    </div>
-
     <!-- Cyber Threat Map -->
     <div class="panel">
         <iframe src="https://threatmap.checkpoint.com/"></iframe>
@@ -113,6 +182,17 @@ iframe {
     <div class="panel">
         <iframe src="https://notes.io/"></iframe>
     </div>
+</div>
+<div class="panel" id="flights">
+    <iframe src="https://globe.adsbexchange.com/"></iframe>
+</div>
+
+<div class="panel" id="ships">
+    <iframe src="https://www.marinetraffic.com/en/ais/embed/zoom:3"></iframe>
+</div>
+
+<div class="panel" id="iran">
+    <iframe src="https://iranwarlive.com/"></iframe>
 </div>
 
 </body>
