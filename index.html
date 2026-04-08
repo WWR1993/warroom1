@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+/* Base styles */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -23,6 +24,7 @@ header {
     font-weight: bold;
 }
 
+/* Scrolling alert ticker */
 .ticker {
     background: #000;
     color: red;
@@ -43,27 +45,60 @@ header {
     100% { transform: translateX(-100%); }
 }
 
-<!-- Dropdown Menu -->
-<div class="dropdown">
-  <button class="dropbtn">Options ⚙️</button>
-  <div class="dropdown-content">
-    <a href="#" onclick="showPanel('flights')">Flights</a>
-    <a href="#" onclick="showPanel('ships')">Ships</a>
-    <a href="#" onclick="showPanel('iran')">Iran War Map</a>
-    <a href="#" onclick="showPanel('osint')">OSINT Feed</a>
-    <a href="https://notes.io/" target="_blank">Notes</a>
-    <a href="https://rsshub.app/inteldesk/live" target="_blank">IntelDesk Feed</a>
-  </div>
-</div>
-    
+/* Dropdown styles */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+}
+
+.dropbtn {
+  background-color: #111;
+  color: #00ff00;
+  padding: 8px 16px;
+  font-size: 16px;
+  border: 1px solid #00ff00;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #000;
+  min-width: 200px;
+  border: 1px solid #00ff00;
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: #00ff00;
+  padding: 8px 12px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #111;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: #111;
+}
+
+/* Grid layout */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     grid-auto-rows: 40vh;
     gap: 8px;
     padding: 8px;
 }
 
+/* Panels */
 .panel {
     border: 1px solid #00ff00;
     background: #000;
@@ -77,67 +112,6 @@ iframe {
     border: none;
 }
 </style>
-/* Dropdown container */
-.dropdown {
-  position: relative;
-  display: inline-block;
-  margin: 10px;
-}
-
-/* Button styling */
-.dropbtn {
-  background-color: #111;
-  color: #00ff00;
-  padding: 8px 16px;
-  font-size: 16px;
-  border: 1px solid #00ff00;
-  cursor: pointer;
-}
-
-/* Dropdown menu (hidden by default) */
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #000;
-  min-width: 200px;
-  border: 1px solid #00ff00;
-  z-index: 1;
-}
-
-/* Links inside the dropdown */
-.dropdown-content a {
-  color: #00ff00;
-  padding: 8px 12px;
-  text-decoration: none;
-  display: block;
-}
-
-/* Hover effect */
-.dropdown-content a:hover {
-  background-color: #111;
-}
-
-/* Show dropdown on hover */
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-/* Button hover */
-.dropdown:hover .dropbtn {
-  background-color: #111;
-}
-
-<script>
-function showPanel(panelId) {
-    // Hide all panels first
-    const panels = document.querySelectorAll('.panel');
-    panels.forEach(p => p.style.display = 'none');
-
-    // Show only the selected panel
-    const selected = document.getElementById(panelId);
-    if(selected) selected.style.display = 'block';
-}
-</script>
 </head>
 
 <body>
@@ -147,53 +121,74 @@ function showPanel(panelId) {
     <span>⚠️ ALERTS: Monitoring Iran conflict • Missile/Drone Activity • OSINT Updates Live • Cyber Threats Active ⚠️</span>
 </div>
 
+<!-- Dropdown Menu -->
+<div class="dropdown">
+  <button class="dropbtn">Options ⚙️</button>
+  <div class="dropdown-content">
+    <a href="#" onclick="togglePanel('flights')">Flights</a>
+    <a href="#" onclick="togglePanel('ships')">Ships</a>
+    <a href="#" onclick="togglePanel('iran')">Iran War Map</a>
+    <a href="#" onclick="togglePanel('osint')">OSINT Feed</a>
+    <a href="#" onclick="togglePanel('cyber')">Cyber Threat Map</a>
+    <a href="#" onclick="togglePanel('stocks')">Stocks</a>
+    <a href="#" onclick="togglePanel('radio')">Radio/Emergency</a>
+    <a href="#" onclick="togglePanel('notes')">Notes</a>
+  </div>
+</div>
+
 <div class="grid">
     <!-- Flights -->
-    <div class="panel">
+    <div class="panel" id="flights">
         <iframe src="https://globe.adsbexchange.com/"></iframe>
     </div>
 
     <!-- Ships -->
-    <div class="panel">
+    <div class="panel" id="ships">
         <iframe src="https://www.marinetraffic.com/en/ais/embed/zoom:3"></iframe>
     </div>
 
     <!-- Stocks -->
-    <div class="panel">
+    <div class="panel" id="stocks">
         <iframe src="https://s.tradingview.com/widgetembed/?symbols=NASDAQ:AAPL,NYSE:TSLA,AMEX:SPY,FOREXCOM:SPXUSD&theme=dark"></iframe>
     </div>
 
     <!-- Iran War Map -->
-    <div class="panel">
+    <div class="panel" id="iran">
         <iframe src="https://iranwarlive.com/"></iframe>
     </div>
 
+    <!-- OSINT Feed -->
+    <div class="panel" id="osint">
+        <iframe src="https://rsshub.app/inteldesk/live"></iframe>
+    </div>
+
     <!-- Cyber Threat Map -->
-    <div class="panel">
+    <div class="panel" id="cyber">
         <iframe src="https://threatmap.checkpoint.com/"></iframe>
     </div>
 
     <!-- Emergency / Radio Feed -->
-    <div class="panel">
+    <div class="panel" id="radio">
         <iframe src="https://www.broadcastify.com/listen/"></iframe>
     </div>
 
     <!-- Quick Notes / Links -->
-    <div class="panel">
+    <div class="panel" id="notes">
         <iframe src="https://notes.io/"></iframe>
     </div>
 </div>
-<div class="panel" id="flights">
-    <iframe src="https://globe.adsbexchange.com/"></iframe>
-</div>
 
-<div class="panel" id="ships">
-    <iframe src="https://www.marinetraffic.com/en/ais/embed/zoom:3"></iframe>
-</div>
-
-<div class="panel" id="iran">
-    <iframe src="https://iranwarlive.com/"></iframe>
-</div>
+<script>
+// Toggle panels (show/hide) for dropdown menu
+function togglePanel(panelId) {
+    const panel = document.getElementById(panelId);
+    if(panel.style.display === 'block' || panel.style.display === '')
+        panel.style.display = 'none';
+    else
+        panel.style.display = 'block';
+}
+</script>
 
 </body>
 </html>
+
