@@ -322,33 +322,65 @@ function setDEFCON(level){
     el.textContent=labels[level];
 }
 
-// TICKER FETCH (Reuters + AP + SentDefender)
-// SIMPLE LOCAL TICKER (no network)
+// WORKING TICKER FEEDS (Browser-safe)
 const tickerContent = document.getElementById('ticker-content');
-const tickerSound = document.getElementById('alert-sound'); // still here for later
+const tickerSound = document.getElementById('alert-sound');
 let lastAlerts = [];
 
-function loadLocalTicker() {
-    const items = [
-        { title: "TEST ALERT 1 - If you see this, ticker is working", link: "#", priority: true },
-        { title: "TEST ALERT 2 - Scrolling OK, feeds are the only issue", link: "#", priority: false },
-        { title: "TEST ALERT 3 - War Room online", link: "#", priority: false }
-    ];
+async function fetchTicker() {
+    try {
+        const feeds = [
+            "https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/liveuamap/news",
+            "https://api.rss2json.com/v1/api.json?rss_url=http://feeds.bbci.co.uk/news/world/rss.xml",
+            "https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/aljazeera/news"
+        ];
 
-    tickerContent.innerHTML = '';
-    items.forEach(i => {
-        const a = document.createElement('a');
-        a.href = i.link;
-        a.target = '_blank';
-        a.textContent = `⚠️ ${i.title} ⚠️`;
-        a.style.color = i.priority ? 'red' : '#ff0000';
-        a.style.marginRight = '40px';
-        if (i.priority) a.style.animation = 'flash 1s infinite';
-        tickerContent.appendChild(a);
-    });
+        let items = [];
+
+        for (const url of feeds) {
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (data.items) {
+                items = items.concat(
+                    data.items.slice(0, 5).map(i => ({
+                        title: i.title,
+                        link: i.link,
+                        priority:
+                            i.title.toLowerCase().includes("breaking") ||
+                            i.title.toLowerCase().includes("alert") ||
+                            i.title.toLowerCase().includes("missile")
+                    }))
+                );
+            }
+        }
+
+        const newText = items.map(i => i.title).join("||");
+        if (newText !== lastAlerts.map(a => a.title).join("||") && lastAlerts.length > 0) {
+            tickerSound.play();
+        }
+        lastAlerts = items;
+
+        tickerContent.innerHTML = "";
+        items.forEach(i => {
+            const a = document.createElement("a");
+            a.href = i.link;
+            a.target = "_blank";
+            a.textContent = `⚠️ ${i.title} ⚠️`;
+            a.style.color = i.priority ? "red" : "#ff0000";
+            a.style.marginRight = "40px";
+            if (i.priority) a.style.animation = "flash 1s infinite";
+            tickerContent.appendChild(a);
+        });
+
+    } catch (e) {
+        console.error(e);
+        tickerContent.textContent = "Unable to load alerts.";
+    }
 }
 
-loadLocalTicker();
+fetchTicker();
+setInterval(fetchTicker, 30000);
 
 
 // TICKER SCROLL (classic marquee)
