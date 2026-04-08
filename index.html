@@ -323,62 +323,33 @@ function setDEFCON(level){
 }
 
 // TICKER FETCH (Reuters + AP + SentDefender)
-const tickerContent=document.getElementById('ticker-content');
-const tickerSound=document.getElementById('alert-sound');
-let lastAlerts=[];
+// SIMPLE LOCAL TICKER (no network)
+const tickerContent = document.getElementById('ticker-content');
+const tickerSound = document.getElementById('alert-sound'); // still here for later
+let lastAlerts = [];
 
-async function fetchTicker(){
-    try{
-        const feeds=[
-            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/reuters/world',
-            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/apnews/topics/apf-topnews',
-            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/twitter/user/SentDefender'
-        ];
+function loadLocalTicker() {
+    const items = [
+        { title: "TEST ALERT 1 - If you see this, ticker is working", link: "#", priority: true },
+        { title: "TEST ALERT 2 - Scrolling OK, feeds are the only issue", link: "#", priority: false },
+        { title: "TEST ALERT 3 - War Room online", link: "#", priority: false }
+    ];
 
-        let items=[];
-
-        for(const url of feeds){
-            const res=await fetch(url);
-            const data=await res.json();
-
-            if(data.items){
-                items=items.concat(
-                    data.items.slice(0,5).map(i=>({
-                        title:i.title,
-                        link:i.link,
-                        priority:i.title.toLowerCase().includes('breaking') ||
-                                 i.title.toLowerCase().includes('alert') ||
-                                 i.title.toLowerCase().includes('missile')
-                    }))
-                );
-            }
-        }
-
-        const newText=items.map(i=>i.title).join('||');
-        if(newText!==lastAlerts.map(a=>a.title).join('||') && lastAlerts.length>0){
-            tickerSound.play();
-        }
-        lastAlerts=items;
-
-        tickerContent.innerHTML='';
-        items.forEach(i=>{
-            const a=document.createElement('a');
-            a.href=i.link;
-            a.target='_blank';
-            a.textContent=`⚠️ ${i.title} ⚠️`;
-            a.style.color=i.priority?'red':'#ff0000';
-            a.style.marginRight='40px';
-            if(i.priority) a.style.animation='flash 1s infinite';
-            tickerContent.appendChild(a);
-        });
-
-    }catch(e){
-        console.error(e);
-        tickerContent.textContent='Unable to load alerts.';
-    }
+    tickerContent.innerHTML = '';
+    items.forEach(i => {
+        const a = document.createElement('a');
+        a.href = i.link;
+        a.target = '_blank';
+        a.textContent = `⚠️ ${i.title} ⚠️`;
+        a.style.color = i.priority ? 'red' : '#ff0000';
+        a.style.marginRight = '40px';
+        if (i.priority) a.style.animation = 'flash 1s infinite';
+        tickerContent.appendChild(a);
+    });
 }
-fetchTicker();
-setInterval(fetchTicker,30000);
+
+loadLocalTicker();
+
 
 // TICKER SCROLL (classic marquee)
 let pos=window.innerWidth;
