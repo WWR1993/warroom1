@@ -432,6 +432,69 @@ async function checkMissileLaunch(){
 setInterval(checkMissileLaunch,45000);
 checkMissileLaunch();
 
+// AUTO-DEFCON SYSTEM (NORAD + Global Escalation Keywords)
+async function autoDEFCON() {
+    try {
+        const feeds = [
+            "https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/liveuamap/news",
+            "https://api.rss2json.com/v1/api.json?rss_url=http://feeds.bbci.co.uk/news/world/rss.xml",
+            "https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/aljazeera/news"
+        ];
+
+        const noradKeywords = [
+            "norad", "aerospace warning", "air defense", "scramble",
+            "intercept", "unidentified aircraft", "russian bomber",
+            "chinese aircraft", "airspace violation"
+        ];
+
+        const escalationKeywords = [
+            "missile", "ballistic", "icbm", "nuclear", "strike",
+            "mobilization", "escalation", "attack", "retaliation",
+            "state of emergency"
+        ];
+
+        let escalationScore = 0;
+
+        for (const url of feeds) {
+            const res = await fetch(url);
+            const data = await res.json();
+            if (!data.items) continue;
+
+            for (const item of data.items.slice(0, 10)) {
+                const t = item.title.toLowerCase();
+
+                if (noradKeywords.some(k => t.includes(k))) {
+                    escalationScore += 2;
+                }
+
+                if (escalationKeywords.some(k => t.includes(k))) {
+                    escalationScore += 3;
+                }
+            }
+        }
+
+        // DEFCON Logic
+        if (escalationScore >= 12) {
+            setDEFCON(1); // Nuclear-level indicators
+        } else if (escalationScore >= 7) {
+            setDEFCON(2); // Major escalation
+        } else if (escalationScore >= 3) {
+            setDEFCON(3); // Elevated readiness
+        } else {
+            // Do NOT auto-lower DEFCON
+            // Manual reset only
+        }
+
+    } catch (e) {
+        console.error("Auto-DEFCON error:", e);
+    }
+}
+
+// Check every 60 seconds
+setInterval(autoDEFCON, 60000);
+autoDEFCON();
+
+
 // WHITE HOUSE LIVE ALERT
 setInterval(async ()=>{
     try{
