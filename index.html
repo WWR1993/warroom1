@@ -32,12 +32,13 @@ header {
     padding: 5px;
     overflow: hidden;
     white-space: nowrap;
+    width: 100%;
 }
 
 .ticker span {
     display: inline-block;
     padding-left: 100%;
-    animation: scroll 20s linear infinite;
+    animation: scroll 30s linear infinite;
 }
 
 @keyframes scroll {
@@ -117,8 +118,12 @@ iframe {
 <body>
 <header>🛰️ ELITE OSINT WAR ROOM</header>
 
+<!-- Audio for alerts -->
+<audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
+
+<!-- Live Ticker -->
 <div class="ticker">
-    <span>⚠️ ALERTS: Monitoring Iran conflict • Missile/Drone Activity • OSINT Updates Live • Cyber Threats Active ⚠️</span>
+    <span id="ticker-text">Loading alerts…</span>
 </div>
 
 <!-- Dropdown Menu -->
@@ -179,7 +184,7 @@ iframe {
 </div>
 
 <script>
-// Toggle panels (show/hide) for dropdown menu
+// Toggle panels (show/hide) from dropdown
 function togglePanel(panelId) {
     const panel = document.getElementById(panelId);
     if(panel.style.display === 'block' || panel.style.display === '')
@@ -187,6 +192,50 @@ function togglePanel(panelId) {
     else
         panel.style.display = 'block';
 }
+
+// Live ticker fetching multiple feeds with chime
+let lastAlertText = ''; // store previous alerts
+async function fetchTicker() {
+    const tickerEl = document.getElementById('ticker-text');
+    const sound = document.getElementById('alert-sound');
+
+    try {
+        const feeds = [
+            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/inteldesk/live',
+            'https://api.rss2json.com/v1/api.json?rss_url=https://www.reutersagency.com/feed/?best-topics=breaking-news',
+            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/twitter/user/IntelCrusader'
+        ];
+
+        let allTitles = [];
+
+        for (const url of feeds) {
+            const res = await fetch(url);
+            const data = await res.json();
+            if(data.items) {
+                const titles = data.items.slice(0,5).map(i => `⚠️ ${i.title} ⚠️`);
+                allTitles = allTitles.concat(titles);
+            }
+        }
+
+        const newAlertText = allTitles.join(' • ');
+
+        // Play sound if new alerts appear
+        if(newAlertText !== lastAlertText && lastAlertText !== '') {
+            sound.play();
+        }
+
+        tickerEl.textContent = newAlertText;
+        lastAlertText = newAlertText;
+
+    } catch(err) {
+        console.error('Ticker error:', err);
+        tickerEl.textContent = 'Unable to load live alerts.';
+    }
+}
+
+// Initial fetch and refresh every 60 seconds
+fetchTicker();
+setInterval(fetchTicker, 60000);
 </script>
 
 </body>
