@@ -5,8 +5,10 @@
 <title>Elite OSINT War Room</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Interact.js for drag & resize -->
+<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+
 <style>
-/* Base styles */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
@@ -14,7 +16,6 @@ body {
     color: #00ff00;
     overflow-x: hidden;
 }
-
 header {
     padding: 10px;
     text-align: center;
@@ -33,80 +34,45 @@ header {
     overflow: hidden;
     white-space: nowrap;
     width: 100%;
+    position: relative;
 }
-.ticker span {
-    display: inline-block;
-    padding-left: 100%;
-    animation: scroll 30s linear infinite;
-}
-@keyframes scroll {
-    0% { transform: translateX(0%); }
-    100% { transform: translateX(-100%); }
+.ticker a {
+    color: #ff0000;
+    text-decoration: none;
+    margin-right: 30px;
 }
 
-/* Dropdown */
-.dropdown {
-  position: relative;
-  display: inline-block;
-  margin: 10px;
+/* Flash animation */
+@keyframes flash { 
+    0% {opacity: 1;} 
+    50% {opacity: 0;} 
+    100% {opacity: 1;} 
 }
-.dropbtn {
-  background-color: #111;
-  color: #00ff00;
-  padding: 8px 16px;
-  font-size: 16px;
-  border: 1px solid #00ff00;
-  cursor: pointer;
-}
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #000;
-  min-width: 200px;
-  border: 1px solid #00ff00;
-  z-index: 1;
-}
-.dropdown-content a {
-  color: #00ff00;
-  padding: 8px 12px;
-  text-decoration: none;
-  display: block;
-}
-.dropdown-content a:hover {
-  background-color: #111;
-}
-.dropdown:hover .dropdown-content { display: block; }
-.dropdown:hover .dropbtn { background-color: #111; }
 
-/* Grid layout */
+/* Grid / Panels */
 .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     grid-auto-rows: 40vh;
     gap: 8px;
     padding: 8px;
+    position: relative;
 }
-
-/* Panels */
 .panel {
     border: 1px solid #00ff00;
     background: #000;
-    width: 100%;
-    height: 100%;
     position: relative;
-}
-iframe {
     width: 100%;
     height: 100%;
-    border: none;
 }
+iframe { width: 100%; height: 100%; border: none; }
 
-/* Fullscreen toggle button */
+/* Fullscreen */
 .fullscreen-btn {
     position: absolute;
     top: 5px;
     right: 5px;
-    background-color: #111;
+    background: #111;
     color: #00ff00;
     border: 1px solid #00ff00;
     padding: 4px 8px;
@@ -120,16 +86,14 @@ iframe {
 <body>
 <header>🛰️ ELITE OSINT WAR ROOM</header>
 
-<!-- Audio for alerts -->
+<!-- Audio -->
 <audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
 <audio id="live-sound" src="https://www.soundjay.com/button/beep-08b.mp3" preload="auto"></audio>
 
-<!-- Live Ticker -->
-<div class="ticker">
-    <span id="ticker-text">Loading alerts…</span>
-</div>
+<!-- Ticker -->
+<div class="ticker" id="ticker"><span id="ticker-content">Loading alerts…</span></div>
 
-<!-- Dropdown Menu -->
+<!-- Dropdown -->
 <div class="dropdown">
   <button class="dropbtn">Options ⚙️</button>
   <div class="dropdown-content">
@@ -144,142 +108,157 @@ iframe {
   </div>
 </div>
 
-<div class="grid">
-    <!-- Flights -->
-    <div class="panel" id="flights">
-        <button class="fullscreen-btn" onclick="toggleFullscreen('flights')">⛶</button>
+<div class="grid" id="grid">
+    <div class="panel" id="flights"><button class="fullscreen-btn" onclick="toggleFullscreen('flights')">⛶</button>
         <iframe src="https://globe.adsbexchange.com/"></iframe>
     </div>
-
-    <!-- Ships -->
-    <div class="panel" id="ships">
-        <button class="fullscreen-btn" onclick="toggleFullscreen('ships')">⛶</button>
+    <div class="panel" id="ships"><button class="fullscreen-btn" onclick="toggleFullscreen('ships')">⛶</button>
         <iframe src="https://www.marinetraffic.com/en/ais/embed/zoom:3"></iframe>
     </div>
-
-    <!-- Stocks -->
-    <div class="panel" id="stocks">
-        <button class="fullscreen-btn" onclick="toggleFullscreen('stocks')">⛶</button>
+    <div class="panel" id="stocks"><button class="fullscreen-btn" onclick="toggleFullscreen('stocks')">⛶</button>
         <iframe src="https://s.tradingview.com/widgetembed/?symbols=NASDAQ:AAPL,NYSE:TSLA,AMEX:SPY,FOREXCOM:SPXUSD&theme=dark"></iframe>
     </div>
-
-    <!-- Iran War Map -->
-    <div class="panel" id="iran">
-        <button class="fullscreen-btn" onclick="toggleFullscreen('iran')">⛶</button>
+    <div class="panel" id="iran"><button class="fullscreen-btn" onclick="toggleFullscreen('iran')">⛶</button>
         <iframe src="https://iranwarlive.com/"></iframe>
     </div>
-
-    <!-- OSINT Feed (Liveuamap) -->
-    <div class="panel" id="osint">
-        <button class="fullscreen-btn" onclick="toggleFullscreen('osint')">⛶</button>
+    <div class="panel" id="osint"><button class="fullscreen-btn" onclick="toggleFullscreen('osint')">⛶</button>
         <iframe src="https://liveuamap.com/en/embed"></iframe>
     </div>
-
-    <!-- Cyber Threat Map -->
-    <div class="panel" id="cyber">
-        <button class="fullscreen-btn" onclick="toggleFullscreen('cyber')">⛶</button>
+    <div class="panel" id="cyber"><button class="fullscreen-btn" onclick="toggleFullscreen('cyber')">⛶</button>
         <iframe src="https://threatmap.checkpoint.com/"></iframe>
     </div>
-
-    <!-- Emergency / Radio Feed -->
-    <div class="panel" id="radio">
-        <button class="fullscreen-btn" onclick="toggleFullscreen('radio')">⛶</button>
+    <div class="panel" id="radio"><button class="fullscreen-btn" onclick="toggleFullscreen('radio')">⛶</button>
         <iframe src="https://www.broadcastify.com/listen/"></iframe>
     </div>
-
-    <!-- Quick Notes / Links -->
-    <div class="panel" id="notes">
-        <button class="fullscreen-btn" onclick="toggleFullscreen('notes')">⛶</button>
+    <div class="panel" id="notes"><button class="fullscreen-btn" onclick="toggleFullscreen('notes')">⛶</button>
         <iframe src="https://notes.io/"></iframe>
     </div>
 </div>
 
 <script>
-// Toggle panel
-function togglePanel(panelId) {
-    const panel = document.getElementById(panelId);
-    panel.style.display = (panel.style.display === 'block' || panel.style.display === '') ? 'none' : 'block';
+// Draggable & resizable with interact.js
+interact('.panel')
+  .draggable({
+    inertia: true,
+    modifiers: [
+      interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true })
+    ],
+    listeners: { move: dragMoveListener }
+  })
+  .resizable({
+    edges: { left:true, right:true, bottom:true, top:true },
+    inertia: true
+  })
+  .on('resizemove', function(event) {
+      let {x, y} = event.target.dataset;
+      x = (parseFloat(x) || 0);
+      y = (parseFloat(y) || 0);
+      Object.assign(event.target.style, {
+        width: event.rect.width + 'px',
+        height: event.rect.height + 'px',
+        transform: `translate(${x}px, ${y}px)`
+      });
+  });
+
+function dragMoveListener (event) {
+  const target = event.target;
+  const x = (parseFloat(target.dataset.x) || 0) + event.dx;
+  const y = (parseFloat(target.dataset.y) || 0) + event.dy;
+  target.style.transform = `translate(${x}px, ${y}px)`;
+  target.dataset.x = x;
+  target.dataset.y = y;
 }
 
 // Fullscreen toggle
 let fullscreenPanel = null;
-function toggleFullscreen(panelId) {
+function toggleFullscreen(panelId){
     const panel = document.getElementById(panelId);
-    if(fullscreenPanel === panel) {
-        panel.style.position = '';
-        panel.style.top = '';
-        panel.style.left = '';
-        panel.style.width = '';
-        panel.style.height = '';
-        panel.style.zIndex = '';
-        fullscreenPanel = null;
+    if(fullscreenPanel===panel){
+        panel.style.position=''; panel.style.top=''; panel.style.left='';
+        panel.style.width=''; panel.style.height=''; panel.style.zIndex='';
+        fullscreenPanel=null;
     } else {
-        if(fullscreenPanel) {
-            fullscreenPanel.style.position = '';
-            fullscreenPanel.style.top = '';
-            fullscreenPanel.style.left = '';
-            fullscreenPanel.style.width = '';
-            fullscreenPanel.style.height = '';
-            fullscreenPanel.style.zIndex = '';
-        }
-        panel.style.position = 'fixed';
-        panel.style.top = '0';
-        panel.style.left = '0';
-        panel.style.width = '100%';
-        panel.style.height = '100%';
-        panel.style.zIndex = '999';
-        fullscreenPanel = panel;
+        if(fullscreenPanel){fullscreenPanel.style.position=''; fullscreenPanel.style.top=''; fullscreenPanel.style.left='';
+            fullscreenPanel.style.width=''; fullscreenPanel.style.height=''; fullscreenPanel.style.zIndex='';}
+        panel.style.position='fixed'; panel.style.top='0'; panel.style.left='0';
+        panel.style.width='100%'; panel.style.height='100%'; panel.style.zIndex='999';
+        fullscreenPanel=panel;
     }
 }
 
-// Live Ticker with chime
-let lastAlertText = '';
-async function fetchTicker() {
-    const tickerEl = document.getElementById('ticker-text');
-    const sound = document.getElementById('alert-sound');
-    try {
+// Panel toggle
+function togglePanel(panelId){
+    const panel = document.getElementById(panelId);
+    panel.style.display = (panel.style.display==='block'||panel.style.display==='')?'none':'block';
+}
+
+// Ticker
+let lastAlerts=[];
+const tickerContent = document.getElementById('ticker-content');
+const tickerSound = document.getElementById('alert-sound');
+async function fetchTicker(){
+    try{
         const feeds = [
             'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/rss/reuters/world',
             'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/twitter/user/IntelCrusader'
         ];
-        let allTitles = [];
-        for (const url of feeds) {
+        let items=[];
+        for(const url of feeds){
             const res = await fetch(url);
             const data = await res.json();
-            if(data.items) {
-                const titles = data.items.slice(0,5).map(i => `⚠️ ${i.title} ⚠️`);
-                allTitles = allTitles.concat(titles);
+            if(data.items){
+                const feedItems = data.items.slice(0,5).map(i=>({title:i.title,link:i.link,priority:i.title.toLowerCase().includes('breaking')}));
+                items = items.concat(feedItems);
             }
         }
-        const newAlertText = allTitles.join(' • ');
-        if(newAlertText !== lastAlertText && lastAlertText !== '') sound.play();
-        tickerEl.textContent = newAlertText;
-        lastAlertText = newAlertText;
-    } catch(err) {
-        console.error('Ticker error:', err);
-        tickerEl.textContent = 'Unable to load live alerts.';
-    }
+        // Play sound if new
+        const newText = items.map(i=>i.title).join('||');
+        if(newText!==lastAlerts.join('||') && lastAlerts.length>0) tickerSound.play();
+        lastAlerts=items;
+
+        // Render ticker
+        tickerContent.innerHTML='';
+        items.forEach(i=>{
+            const a=document.createElement('a');
+            a.href=i.link;
+            a.textContent=`⚠️ ${i.title} ⚠️`;
+            a.target='_blank';
+            a.style.color=i.priority?'red':'#ff0000';
+            a.style.marginRight='30px';
+            if(i.priority) a.style.animation='flash 1s infinite';
+            tickerContent.appendChild(a);
+        });
+    } catch(e){ console.error(e); tickerContent.textContent='Unable to load alerts.'; }
 }
 fetchTicker();
-setInterval(fetchTicker, 60000);
+setInterval(fetchTicker,60000);
 
-// White House YouTube live alert
-const youtubeLiveIframe = document.createElement('iframe');
-youtubeLiveIframe.src = 'https://www.youtube.com/embed/live_stream?channel=WhiteHouse';
-youtubeLiveIframe.style.display = 'none';
-document.body.appendChild(youtubeLiveIframe);
+// Continuous scroll
+function scrollTicker(){
+    const ticker = document.getElementById('ticker');
+    const span = document.getElementById('ticker-content');
+    let pos = ticker.offsetWidth;
+    function step(){
+        pos--;
+        if(pos<-span.offsetWidth) pos=ticker.offsetWidth;
+        span.style.transform=`translateX(${pos}px)`;
+        requestAnimationFrame(step);
+    }
+    step();
+}
+scrollTicker();
 
-setInterval(() => {
-    fetch('https://www.youtube.com/embed/live_stream?channel=WhiteHouse')
-    .then(res => res.text())
-    .then(data => {
-        if(data.includes('LIVE')) {
-            const liveSound = document.getElementById('live-sound');
-            liveSound.play();
+// White House live alert
+setInterval(async ()=>{
+    try{
+        const res=await fetch('https://www.youtube.com/embed/live_stream?channel=WhiteHouse');
+        const text=await res.text();
+        if(text.includes('LIVE')){
+            document.getElementById('live-sound').play();
             alert('⚠️ The White House is LIVE on YouTube! ⚠️');
         }
-    }).catch(()=>{});
-}, 60000);
+    } catch{}
+},60000);
 </script>
 </body>
 </html>
