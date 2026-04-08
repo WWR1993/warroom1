@@ -119,38 +119,26 @@ function togglePanel(panelId){
     panel.style.display=(panel.style.display==='block'||panel.style.display==='')?'none':'block';
 }
 
-// Ticker
-const tickerContent=document.getElementById('ticker-content');
-const tickerSound=document.getElementById('alert-sound');
-let lastAlerts=[];
-async function fetchTicker(){
-    try{
-        const feeds=[
-            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/rss/reuters/world',
-            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/twitter/user/IntelCrusader'
-        ];
-        let items=[];
-        for(const url of feeds){
-            const res=await fetch(url);
-            const data=await res.json();
-            if(data.items){ items=items.concat(data.items.slice(0,5).map(i=>({title:i.title, link:i.link, priority:i.title.toLowerCase().includes('breaking')}))); }
-        }
-        const newText=items.map(i=>i.title).join('||');
-        if(newText!==lastAlerts.map(a=>a.title).join('||') && lastAlerts.length>0) tickerSound.play();
-        lastAlerts=items;
-        tickerContent.innerHTML='';
-        items.forEach(i=>{
-            const a=document.createElement('a');
-            a.href=i.link; a.target='_blank';
-            a.textContent=`⚠️ ${i.title} ⚠️`;
-            a.style.color=i.priority?'red':'#ff0000';
-            a.style.marginRight='40px';
-            if(i.priority) a.style.animation='flash 1s infinite';
-            tickerContent.appendChild(a);
-        });
-    }catch(e){console.error(e); tickerContent.textContent='Unable to load alerts.';}
-}
-fetchTicker(); setInterval(fetchTicker,30000);
+<!-- Ticker Bar -->
+<div id="ticker" style="
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    background: #000;
+    color: #ff0000;
+    padding: 8px 0;
+    border-bottom: 2px solid #222;
+    position: relative;
+">
+    <div id="ticker-content" style="
+        display: inline-block;
+        will-change: transform;
+        font-size: 1rem;
+        padding-left: 100%;
+    "></div>
+</div>
+
+<audio id="alert-sound" src="alert.mp3" preload="auto"></audio>
 
 // Scroll ticker
 let pos=window.innerWidth;
