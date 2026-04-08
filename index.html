@@ -5,95 +5,37 @@
 <title>Elite OSINT War Room</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Interact.js for drag & resize -->
 <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #050505;
-    color: #00ff00;
-    overflow-x: hidden;
-}
-header {
-    padding: 10px;
-    text-align: center;
-    background: #111;
-    border-bottom: 2px solid #00ff00;
-    font-size: 24px;
-    font-weight: bold;
-}
-
-/* Ticker */
-.ticker {
-    background: #000;
-    color: red;
-    font-size: 14px;
-    padding: 5px;
-    overflow: hidden;
-    white-space: nowrap;
-    width: 100%;
-    position: relative;
-}
-.ticker a {
-    color: #ff0000;
-    text-decoration: none;
-    margin-right: 30px;
-}
-
-/* Flash animation */
-@keyframes flash { 
-    0% {opacity: 1;} 
-    50% {opacity: 0;} 
-    100% {opacity: 1;} 
-}
-
-/* Grid / Panels */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    grid-auto-rows: 40vh;
-    gap: 8px;
-    padding: 8px;
-    position: relative;
-}
-.panel {
-    border: 1px solid #00ff00;
-    background: #000;
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-iframe { width: 100%; height: 100%; border: none; }
-
-/* Fullscreen */
-.fullscreen-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: #111;
-    color: #00ff00;
-    border: 1px solid #00ff00;
-    padding: 4px 8px;
-    font-size: 12px;
-    cursor: pointer;
-    z-index: 5;
-}
+body { margin:0; font-family:Arial,sans-serif; background:#050505; color:#00ff00; overflow-x:hidden; }
+header { padding:10px; text-align:center; background:#111; border-bottom:2px solid #00ff00; font-size:24px; font-weight:bold; }
+.ticker { position:fixed; top:0; left:0; width:100%; background:#000; color:red; overflow:hidden; white-space:nowrap; z-index:999; padding:5px; }
+.ticker a { text-decoration:none; margin-right:40px; }
+@keyframes flash {0% {opacity:1;} 50% {opacity:0;} 100% {opacity:1;} }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(350px,1fr)); grid-auto-rows:40vh; gap:8px; padding:60px 8px 8px 8px; position:relative; }
+.panel { border:1px solid #00ff00; background:#000; position:relative; width:100%; height:100%; }
+iframe { width:100%; height:100%; border:none; }
+.fullscreen-btn { position:absolute; top:5px; right:5px; background:#111; color:#00ff00; border:1px solid #00ff00; padding:4px 8px; font-size:12px; cursor:pointer; z-index:5; }
+.dropbtn { background-color:#111; color:#00ff00; padding:5px 10px; font-size:14px; border:1px solid #00ff00; cursor:pointer; }
+.dropdown { position:fixed; top:40px; left:10px; z-index:1000; }
+.dropdown-content { display:none; position:absolute; background-color:#111; min-width:160px; border:1px solid #00ff00; z-index:1000; }
+.dropdown-content a { color:#00ff00; padding:5px 10px; text-decoration:none; display:block; }
+.dropdown-content a:hover { background-color:#222; }
+.dropdown:hover .dropdown-content { display:block; }
 </style>
 </head>
 
 <body>
 <header>🛰️ ELITE OSINT WAR ROOM</header>
 
-<!-- Audio -->
 <audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
 <audio id="live-sound" src="https://www.soundjay.com/button/beep-08b.mp3" preload="auto"></audio>
 
-<!-- Ticker -->
-<div class="ticker" id="ticker"><span id="ticker-content">Loading alerts…</span></div>
+<div class="ticker" id="ticker">
+  <div id="ticker-content">Loading alerts…</div>
+</div>
 
-<!-- Dropdown -->
 <div class="dropdown">
   <button class="dropbtn">Options ⚙️</button>
   <div class="dropdown-content">
@@ -104,7 +46,7 @@ iframe { width: 100%; height: 100%; border: none; }
     <a href="#" onclick="togglePanel('cyber')">Cyber Threat Map</a>
     <a href="#" onclick="togglePanel('stocks')">Stocks</a>
     <a href="#" onclick="togglePanel('radio')">Radio/Emergency</a>
-    <a href="#" onclick="togglePanel('notes')">Notes</a>
+    <a href="#" onclick="togglePanel('pizzaindex')">PizzaIndex</a>
   </div>
 </div>
 
@@ -130,122 +72,83 @@ iframe { width: 100%; height: 100%; border: none; }
     <div class="panel" id="radio"><button class="fullscreen-btn" onclick="toggleFullscreen('radio')">⛶</button>
         <iframe src="https://www.broadcastify.com/listen/"></iframe>
     </div>
-    <div class="panel" id="notes"><button class="fullscreen-btn" onclick="toggleFullscreen('notes')">⛶</button>
-        <iframe src="https://notes.io/"></iframe>
+    <div class="panel" id="pizzaindex"><button class="fullscreen-btn" onclick="toggleFullscreen('pizzaindex')">⛶</button>
+        <iframe src="https://pizzaindex.com/"></iframe>
     </div>
 </div>
 
 <script>
-// Draggable & resizable with interact.js
+// Drag & resize
 interact('.panel')
-  .draggable({
-    inertia: true,
-    modifiers: [
-      interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true })
-    ],
-    listeners: { move: dragMoveListener }
-  })
-  .resizable({
-    edges: { left:true, right:true, bottom:true, top:true },
-    inertia: true
-  })
-  .on('resizemove', function(event) {
-      let {x, y} = event.target.dataset;
-      x = (parseFloat(x) || 0);
-      y = (parseFloat(y) || 0);
-      Object.assign(event.target.style, {
-        width: event.rect.width + 'px',
-        height: event.rect.height + 'px',
-        transform: `translate(${x}px, ${y}px)`
-      });
+  .draggable({ inertia:true, modifiers:[ interact.modifiers.restrictRect({restriction:'parent', endOnly:true})], listeners:{move:dragMoveListener} })
+  .resizable({ edges:{left:true,right:true,bottom:true,top:true}, inertia:true })
+  .on('resizemove', function(event){
+      let {x,y}=event.target.dataset; x=parseFloat(x)||0; y=parseFloat(y)||0;
+      Object.assign(event.target.style,{width:event.rect.width+'px', height:event.rect.height+'px', transform:`translate(${x}px,${y}px)`});
   });
 
-function dragMoveListener (event) {
-  const target = event.target;
-  const x = (parseFloat(target.dataset.x) || 0) + event.dx;
-  const y = (parseFloat(target.dataset.y) || 0) + event.dy;
-  target.style.transform = `translate(${x}px, ${y}px)`;
-  target.dataset.x = x;
-  target.dataset.y = y;
+function dragMoveListener(event){
+  const target=event.target;
+  const x=(parseFloat(target.dataset.x)||0)+event.dx;
+  const y=(parseFloat(target.dataset.y)||0)+event.dy;
+  target.style.transform=`translate(${x}px,${y}px)`;
+  target.dataset.x=x; target.dataset.y=y;
 }
 
-// Fullscreen toggle
-let fullscreenPanel = null;
+// Fullscreen
+let fullscreenPanel=null;
 function toggleFullscreen(panelId){
-    const panel = document.getElementById(panelId);
-    if(fullscreenPanel===panel){
-        panel.style.position=''; panel.style.top=''; panel.style.left='';
-        panel.style.width=''; panel.style.height=''; panel.style.zIndex='';
-        fullscreenPanel=null;
-    } else {
-        if(fullscreenPanel){fullscreenPanel.style.position=''; fullscreenPanel.style.top=''; fullscreenPanel.style.left='';
-            fullscreenPanel.style.width=''; fullscreenPanel.style.height=''; fullscreenPanel.style.zIndex='';}
-        panel.style.position='fixed'; panel.style.top='0'; panel.style.left='0';
-        panel.style.width='100%'; panel.style.height='100%'; panel.style.zIndex='999';
+    const panel=document.getElementById(panelId);
+    if(fullscreenPanel===panel){ panel.style.position=''; panel.style.top=''; panel.style.left=''; panel.style.width=''; panel.style.height=''; panel.style.zIndex=''; fullscreenPanel=null; }
+    else{
+        if(fullscreenPanel){ fullscreenPanel.style.position=''; fullscreenPanel.style.top=''; fullscreenPanel.style.left=''; fullscreenPanel.style.width=''; fullscreenPanel.style.height=''; fullscreenPanel.style.zIndex=''; }
+        panel.style.position='fixed'; panel.style.top='0'; panel.style.left='0'; panel.style.width='100%'; panel.style.height='100%'; panel.style.zIndex='999';
         fullscreenPanel=panel;
     }
 }
 
-// Panel toggle
+// Toggle panel visibility
 function togglePanel(panelId){
-    const panel = document.getElementById(panelId);
-    panel.style.display = (panel.style.display==='block'||panel.style.display==='')?'none':'block';
+    const panel=document.getElementById(panelId);
+    panel.style.display=(panel.style.display==='block'||panel.style.display==='')?'none':'block';
 }
 
 // Ticker
+const tickerContent=document.getElementById('ticker-content');
+const tickerSound=document.getElementById('alert-sound');
 let lastAlerts=[];
-const tickerContent = document.getElementById('ticker-content');
-const tickerSound = document.getElementById('alert-sound');
 async function fetchTicker(){
     try{
-        const feeds = [
+        const feeds=[
             'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/rss/reuters/world',
             'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/twitter/user/IntelCrusader'
         ];
         let items=[];
         for(const url of feeds){
-            const res = await fetch(url);
-            const data = await res.json();
-            if(data.items){
-                const feedItems = data.items.slice(0,5).map(i=>({title:i.title,link:i.link,priority:i.title.toLowerCase().includes('breaking')}));
-                items = items.concat(feedItems);
-            }
+            const res=await fetch(url);
+            const data=await res.json();
+            if(data.items){ items=items.concat(data.items.slice(0,5).map(i=>({title:i.title, link:i.link, priority:i.title.toLowerCase().includes('breaking')}))); }
         }
-        // Play sound if new
-        const newText = items.map(i=>i.title).join('||');
-        if(newText!==lastAlerts.join('||') && lastAlerts.length>0) tickerSound.play();
+        const newText=items.map(i=>i.title).join('||');
+        if(newText!==lastAlerts.map(a=>a.title).join('||') && lastAlerts.length>0) tickerSound.play();
         lastAlerts=items;
-
-        // Render ticker
         tickerContent.innerHTML='';
         items.forEach(i=>{
             const a=document.createElement('a');
-            a.href=i.link;
+            a.href=i.link; a.target='_blank';
             a.textContent=`⚠️ ${i.title} ⚠️`;
-            a.target='_blank';
             a.style.color=i.priority?'red':'#ff0000';
-            a.style.marginRight='30px';
+            a.style.marginRight='40px';
             if(i.priority) a.style.animation='flash 1s infinite';
             tickerContent.appendChild(a);
         });
-    } catch(e){ console.error(e); tickerContent.textContent='Unable to load alerts.'; }
+    }catch(e){console.error(e); tickerContent.textContent='Unable to load alerts.';}
 }
-fetchTicker();
-setInterval(fetchTicker,60000);
+fetchTicker(); setInterval(fetchTicker,30000);
 
-// Continuous scroll
-function scrollTicker(){
-    const ticker = document.getElementById('ticker');
-    const span = document.getElementById('ticker-content');
-    let pos = ticker.offsetWidth;
-    function step(){
-        pos--;
-        if(pos<-span.offsetWidth) pos=ticker.offsetWidth;
-        span.style.transform=`translateX(${pos}px)`;
-        requestAnimationFrame(step);
-    }
-    step();
-}
+// Scroll ticker
+let pos=window.innerWidth;
+function scrollTicker(){ pos--; if(pos<-tickerContent.offsetWidth) pos=window.innerWidth; tickerContent.style.transform=`translateX(${pos}px)`; requestAnimationFrame(scrollTicker);}
 scrollTicker();
 
 // White House live alert
@@ -253,11 +156,8 @@ setInterval(async ()=>{
     try{
         const res=await fetch('https://www.youtube.com/embed/live_stream?channel=WhiteHouse');
         const text=await res.text();
-        if(text.includes('LIVE')){
-            document.getElementById('live-sound').play();
-            alert('⚠️ The White House is LIVE on YouTube! ⚠️');
-        }
-    } catch{}
+        if(text.includes('LIVE')){ document.getElementById('live-sound').play(); alert('⚠️ The White House is LIVE on YouTube! ⚠️'); }
+    }catch{}
 },60000);
 </script>
 </body>
