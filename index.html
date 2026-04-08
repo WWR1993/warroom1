@@ -24,7 +24,7 @@ header {
     font-weight: bold;
 }
 
-/* Scrolling alert ticker */
+/* Ticker */
 .ticker {
     background: #000;
     color: red;
@@ -34,25 +34,22 @@ header {
     white-space: nowrap;
     width: 100%;
 }
-
 .ticker span {
     display: inline-block;
     padding-left: 100%;
     animation: scroll 30s linear infinite;
 }
-
 @keyframes scroll {
     0% { transform: translateX(0%); }
     100% { transform: translateX(-100%); }
 }
 
-/* Dropdown styles */
+/* Dropdown */
 .dropdown {
   position: relative;
   display: inline-block;
   margin: 10px;
 }
-
 .dropbtn {
   background-color: #111;
   color: #00ff00;
@@ -61,7 +58,6 @@ header {
   border: 1px solid #00ff00;
   cursor: pointer;
 }
-
 .dropdown-content {
   display: none;
   position: absolute;
@@ -70,25 +66,17 @@ header {
   border: 1px solid #00ff00;
   z-index: 1;
 }
-
 .dropdown-content a {
   color: #00ff00;
   padding: 8px 12px;
   text-decoration: none;
   display: block;
 }
-
 .dropdown-content a:hover {
   background-color: #111;
 }
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-.dropdown:hover .dropbtn {
-  background-color: #111;
-}
+.dropdown:hover .dropdown-content { display: block; }
+.dropdown:hover .dropbtn { background-color: #111; }
 
 /* Grid layout */
 .grid {
@@ -105,12 +93,26 @@ header {
     background: #000;
     width: 100%;
     height: 100%;
+    position: relative;
 }
-
 iframe {
     width: 100%;
     height: 100%;
     border: none;
+}
+
+/* Fullscreen toggle button */
+.fullscreen-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: #111;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    z-index: 5;
 }
 </style>
 </head>
@@ -120,6 +122,7 @@ iframe {
 
 <!-- Audio for alerts -->
 <audio id="alert-sound" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
+<audio id="live-sound" src="https://www.soundjay.com/button/beep-08b.mp3" preload="auto"></audio>
 
 <!-- Live Ticker -->
 <div class="ticker">
@@ -144,70 +147,102 @@ iframe {
 <div class="grid">
     <!-- Flights -->
     <div class="panel" id="flights">
+        <button class="fullscreen-btn" onclick="toggleFullscreen('flights')">⛶</button>
         <iframe src="https://globe.adsbexchange.com/"></iframe>
     </div>
 
     <!-- Ships -->
     <div class="panel" id="ships">
+        <button class="fullscreen-btn" onclick="toggleFullscreen('ships')">⛶</button>
         <iframe src="https://www.marinetraffic.com/en/ais/embed/zoom:3"></iframe>
     </div>
 
     <!-- Stocks -->
     <div class="panel" id="stocks">
+        <button class="fullscreen-btn" onclick="toggleFullscreen('stocks')">⛶</button>
         <iframe src="https://s.tradingview.com/widgetembed/?symbols=NASDAQ:AAPL,NYSE:TSLA,AMEX:SPY,FOREXCOM:SPXUSD&theme=dark"></iframe>
     </div>
 
     <!-- Iran War Map -->
     <div class="panel" id="iran">
+        <button class="fullscreen-btn" onclick="toggleFullscreen('iran')">⛶</button>
         <iframe src="https://iranwarlive.com/"></iframe>
     </div>
 
-    <!-- OSINT Feed -->
+    <!-- OSINT Feed (Liveuamap) -->
     <div class="panel" id="osint">
-        <iframe src="https://rsshub.app/inteldesk/live"></iframe>
+        <button class="fullscreen-btn" onclick="toggleFullscreen('osint')">⛶</button>
+        <iframe src="https://liveuamap.com/en/embed"></iframe>
     </div>
 
     <!-- Cyber Threat Map -->
     <div class="panel" id="cyber">
+        <button class="fullscreen-btn" onclick="toggleFullscreen('cyber')">⛶</button>
         <iframe src="https://threatmap.checkpoint.com/"></iframe>
     </div>
 
     <!-- Emergency / Radio Feed -->
     <div class="panel" id="radio">
+        <button class="fullscreen-btn" onclick="toggleFullscreen('radio')">⛶</button>
         <iframe src="https://www.broadcastify.com/listen/"></iframe>
     </div>
 
     <!-- Quick Notes / Links -->
     <div class="panel" id="notes">
+        <button class="fullscreen-btn" onclick="toggleFullscreen('notes')">⛶</button>
         <iframe src="https://notes.io/"></iframe>
     </div>
 </div>
 
 <script>
-// Toggle panels (show/hide) from dropdown
+// Toggle panel
 function togglePanel(panelId) {
     const panel = document.getElementById(panelId);
-    if(panel.style.display === 'block' || panel.style.display === '')
-        panel.style.display = 'none';
-    else
-        panel.style.display = 'block';
+    panel.style.display = (panel.style.display === 'block' || panel.style.display === '') ? 'none' : 'block';
 }
 
-// Live ticker fetching multiple feeds with chime
-let lastAlertText = ''; // store previous alerts
+// Fullscreen toggle
+let fullscreenPanel = null;
+function toggleFullscreen(panelId) {
+    const panel = document.getElementById(panelId);
+    if(fullscreenPanel === panel) {
+        panel.style.position = '';
+        panel.style.top = '';
+        panel.style.left = '';
+        panel.style.width = '';
+        panel.style.height = '';
+        panel.style.zIndex = '';
+        fullscreenPanel = null;
+    } else {
+        if(fullscreenPanel) {
+            fullscreenPanel.style.position = '';
+            fullscreenPanel.style.top = '';
+            fullscreenPanel.style.left = '';
+            fullscreenPanel.style.width = '';
+            fullscreenPanel.style.height = '';
+            fullscreenPanel.style.zIndex = '';
+        }
+        panel.style.position = 'fixed';
+        panel.style.top = '0';
+        panel.style.left = '0';
+        panel.style.width = '100%';
+        panel.style.height = '100%';
+        panel.style.zIndex = '999';
+        fullscreenPanel = panel;
+    }
+}
+
+// Live Ticker with chime
+let lastAlertText = '';
 async function fetchTicker() {
     const tickerEl = document.getElementById('ticker-text');
     const sound = document.getElementById('alert-sound');
-
     try {
         const feeds = [
-            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/inteldesk/live',
-            'https://api.rss2json.com/v1/api.json?rss_url=https://www.reutersagency.com/feed/?best-topics=breaking-news',
+            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/rss/reuters/world',
             'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/twitter/user/IntelCrusader'
         ];
-
         let allTitles = [];
-
         for (const url of feeds) {
             const res = await fetch(url);
             const data = await res.json();
@@ -216,28 +251,36 @@ async function fetchTicker() {
                 allTitles = allTitles.concat(titles);
             }
         }
-
         const newAlertText = allTitles.join(' • ');
-
-        // Play sound if new alerts appear
-        if(newAlertText !== lastAlertText && lastAlertText !== '') {
-            sound.play();
-        }
-
+        if(newAlertText !== lastAlertText && lastAlertText !== '') sound.play();
         tickerEl.textContent = newAlertText;
         lastAlertText = newAlertText;
-
     } catch(err) {
         console.error('Ticker error:', err);
         tickerEl.textContent = 'Unable to load live alerts.';
     }
 }
-
-// Initial fetch and refresh every 60 seconds
 fetchTicker();
 setInterval(fetchTicker, 60000);
-</script>
 
+// White House YouTube live alert
+const youtubeLiveIframe = document.createElement('iframe');
+youtubeLiveIframe.src = 'https://www.youtube.com/embed/live_stream?channel=WhiteHouse';
+youtubeLiveIframe.style.display = 'none';
+document.body.appendChild(youtubeLiveIframe);
+
+setInterval(() => {
+    fetch('https://www.youtube.com/embed/live_stream?channel=WhiteHouse')
+    .then(res => res.text())
+    .then(data => {
+        if(data.includes('LIVE')) {
+            const liveSound = document.getElementById('live-sound');
+            liveSound.play();
+            alert('⚠️ The White House is LIVE on YouTube! ⚠️');
+        }
+    }).catch(()=>{});
+}, 60000);
+</script>
 </body>
 </html>
 
