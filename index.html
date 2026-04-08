@@ -9,16 +9,26 @@
 
 <style>
 body { margin:0; font-family:Arial,sans-serif; background:#050505; color:#00ff00; overflow-x:hidden; }
-header { padding:10px; text-align:center; background:#111; border-bottom:2px solid #00ff00; font-size:24px; font-weight:bold; }
-.ticker { position:fixed; top:0; left:0; width:100%; background:#000; color:red; overflow:hidden; white-space:nowrap; z-index:999; padding:5px; }
+header {
+    padding:10px; text-align:center; background:#111; border-bottom:2px solid #00ff00;
+    font-size:24px; font-weight:bold; position:sticky; top:0; z-index:1000;
+}
+.ticker {
+    position:sticky; top:50px; left:0; width:100%; background:#000; color:red;
+    overflow:hidden; white-space:nowrap; z-index:999; padding:5px;
+}
 .ticker a { text-decoration:none; margin-right:40px; }
 @keyframes flash {0% {opacity:1;} 50% {opacity:0;} 100% {opacity:1;} }
-.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(350px,1fr)); grid-auto-rows:40vh; gap:8px; padding:60px 8px 8px 8px; position:relative; }
+.grid {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(350px,1fr)); grid-auto-rows:40vh;
+    gap:8px; padding:120px 8px 8px 8px; position:relative; /* top padding accounts for header + ticker */
+}
 .panel { border:1px solid #00ff00; background:#000; position:relative; width:100%; height:100%; }
 iframe { width:100%; height:100%; border:none; }
-.fullscreen-btn { position:absolute; top:5px; right:5px; background:#111; color:#00ff00; border:1px solid #00ff00; padding:4px 8px; font-size:12px; cursor:pointer; z-index:5; }
+.fullscreen-btn { position:absolute; top:5px; right:5px; background:#111; color:#00ff00;
+    border:1px solid #00ff00; padding:4px 8px; font-size:12px; cursor:pointer; z-index:5; }
 .dropbtn { background-color:#111; color:#00ff00; padding:5px 10px; font-size:14px; border:1px solid #00ff00; cursor:pointer; }
-.dropdown { position:fixed; top:40px; left:10px; z-index:1000; }
+.dropdown { position:fixed; top:90px; left:10px; z-index:1000; }
 .dropdown-content { display:none; position:absolute; background-color:#111; min-width:160px; border:1px solid #00ff00; z-index:1000; }
 .dropdown-content a { color:#00ff00; padding:5px 10px; text-decoration:none; display:block; }
 .dropdown-content a:hover { background-color:#222; }
@@ -46,7 +56,6 @@ iframe { width:100%; height:100%; border:none; }
     <a href="#" onclick="togglePanel('cyber')">Cyber Threat Map</a>
     <a href="#" onclick="togglePanel('stocks')">Stocks</a>
     <a href="#" onclick="togglePanel('radio')">Radio/Emergency</a>
-    <a href="#" onclick="togglePanel('pizzaindex')">PizzaIndex</a>
   </div>
 </div>
 
@@ -71,9 +80,6 @@ iframe { width:100%; height:100%; border:none; }
     </div>
     <div class="panel" id="radio"><button class="fullscreen-btn" onclick="toggleFullscreen('radio')">⛶</button>
         <iframe src="https://www.broadcastify.com/listen/"></iframe>
-    </div>
-    <div class="panel" id="pizzaindex"><button class="fullscreen-btn" onclick="toggleFullscreen('pizzaindex')">⛶</button>
-        <iframe src="https://www.pizzint.watch/"></iframe>
     </div>
 </div>
 
