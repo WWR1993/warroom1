@@ -321,9 +321,8 @@ function setDEFCON(level){
     };
     el.textContent=labels[level];
 }
-// Example: setDEFCON(3); // you can call this from console or future UI
 
-// TICKER FETCH
+// TICKER FETCH (Reuters + AP + SentDefender)
 const tickerContent=document.getElementById('ticker-content');
 const tickerSound=document.getElementById('alert-sound');
 let lastAlerts=[];
@@ -331,19 +330,25 @@ let lastAlerts=[];
 async function fetchTicker(){
     try{
         const feeds=[
-            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/rss/reuters/world',
-            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/twitter/user/IntelCrusader'
+            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/reuters/world',
+            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/apnews/topics/apf-topnews',
+            'https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/twitter/user/SentDefender'
         ];
+
         let items=[];
+
         for(const url of feeds){
             const res=await fetch(url);
             const data=await res.json();
+
             if(data.items){
                 items=items.concat(
                     data.items.slice(0,5).map(i=>({
                         title:i.title,
                         link:i.link,
-                        priority:i.title.toLowerCase().includes('breaking')
+                        priority:i.title.toLowerCase().includes('breaking') ||
+                                 i.title.toLowerCase().includes('alert') ||
+                                 i.title.toLowerCase().includes('missile')
                     }))
                 );
             }
@@ -390,7 +395,7 @@ async function checkMissileLaunch(){
     try{
         const feeds=[
             "https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/liveuamap/missile",
-            "https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/rss/reuters/world"
+            "https://api.rss2json.com/v1/api.json?rss_url=https://rsshub.app/reuters/world"
         ];
 
         let detected=false;
@@ -435,6 +440,7 @@ setInterval(async ()=>{
         }
     }catch{}
 },60000);
+
 </script>
 </body>
 </html>
